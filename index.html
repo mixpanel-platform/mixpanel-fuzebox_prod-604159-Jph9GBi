@@ -49,6 +49,7 @@
           unit: intervalType
         }
         MP.api.segment('joinMeeting', propName, params).done(function(results) {
+          console.log(results.values())
           joinMeetingGraph.MPChart('setData', results.values())
         });
       }
