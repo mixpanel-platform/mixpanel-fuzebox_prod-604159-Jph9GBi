@@ -46,7 +46,7 @@
         params = {
           from: fromDate,
           to: toDate,
-          unit: intervalType
+          type: intervalType
         }
         MP.api.segment('joinMeeting', propName, params).done(function(results) {
           console.log(results.values())
