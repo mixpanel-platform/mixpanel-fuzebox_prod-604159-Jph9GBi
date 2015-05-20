@@ -7,11 +7,12 @@
   </head>
   <body class="mixpanel-platform-body">
     <div class="mixpanel-platform-section">
+      <h1></h1>
       <div id="dateSelect" style="float: right;"></div>
       <div id="intervalSelect" style="float: right"></div>
       <div class="by mixpanel-platform-label" style="margin-left: 10px">by</div>
       <div class="propSelect" style="float: left;"></div>
-      <div id="joinMeetingGraph" style="margin-top: 65px"></div>
+      <div id="joinMeetingGraph" style="margin-top: 45px"></div>
       <div style="clear: both;"></div>
     </div>
     <script>
@@ -25,97 +26,54 @@
               {label: 'Average', value: 'average'}
               ]
           },
-          intervalSelect = $('#intervalSelect').MPSelect(options),
+          typeSelect = $('#intervalSelect').MPSelect(options),
+          // set up graph
           joinMeetingGraph = $('#joinMeetingGraph').MPChart({chartType: 'line', highchartsOptions: {
               tooltip: {
                   backgroundColor: '#fffce7'  // Make tooltip background yellow
               }
           }});
           
+      // set the properties in the property selector to match the properties of the specific event we want to segment
       propSelect.MPPropertySelect('setEvent', 'joinMeeting');
           
+          
       function runQuery() {
+        // grab all dropdown values
         var propName = propSelect.MPPropertySelect('value'),
-            intervalType = intervalSelect.MPSelect('value'),
+            typeName = typeSelect.MPSelect('value'),
             dateRange = dateSelect.MPDatepicker('value'),
             fromDate = dateRange.from,
             toDate = dateRange.to;
-
+            
+        // set parameters for Segmentation query
         params = {
           from: fromDate,
           to: toDate,
-          type: intervalType
+          type: typeName
         }
+        
+        // run Segmentation query for 'joinMeeting' event, segmented by whichever property was selected in the dropdown
         MP.api.segment('joinMeeting', propName, params).done(function(results) {
           console.log(results.values())
           joinMeetingGraph.MPChart('setData', results.values())
         });
       }
 
+      // run the query when any dropdowns change
+      propSelect.on('change', function() {
+        runQuery();
+      })
+      dateSelect.on('change', function() {
+        runQuery();
+      });
+      intervalSelect.on('change', function() {
+        runQuery();
+      });
+      
+      // run the query when the report first loads
       runQuery();
 
-    
-    // MP.api.ready(function() {
-    //     /*  First Chart */
-      
-    //     var first_chart = MP.api.events('signUp', {
-    //         from: moment().subtract(1, 'months'),
-    //         unit: 'week'
-    //     });
-     
-    //     var second_chart = MP.api.events('joinMeeting', 'joinMeetingAsHost', {
-    //         from: moment().subtract(1, 'months'),
-    //         unit: 'week'
-    //     });
-       
-       
-    //     var third_chart = MP.api.events('planUpdate', 'isPaid', {
-    //         from: moment().subtract(1, 'months'),
-    //         unit: 'week'
-    //     });
-        
-    //     var fourth_chart = MP.api.events('planUpdate', 'isCancel', {
-    //         from: moment().subtract(1, 'months'),
-    //         unit: 'week'
-    //     });
-        
-    //     $.when(first_chart, second_chart, third_chart, fourth_chart).done(function(first_chart, second_chart, third_chart, fourth_chart) {
-            
-           
-            
-    //         var drawGraph = function(firstChartData, secondChartData, thirdChartData, fourthChartData){
-          
-    //             $('<div class="first"></div>').css({'width':'460px', 'float':'left'}).appendTo('body').MPChart({
-    //                 chartType: 'line',
-    //                 data: firstChartData
-    //             });
-                
-    //             $('<div class="second"></div>').css({'width':'460px', 'float':'right'}).appendTo('body').MPChart({
-    //                 chartType: 'line',
-    //                 data: secondChartData
-    //             });
-                
-    //             $('<div class="third"></div>').css({'width':'460px', 'float':'left'}).appendTo('body').MPChart({
-    //                 chartType: 'pie',
-    //                 data: thirdChartData
-    //             });
-                
-    //             $('<div class="fourth"></div>').css({'width':'460px', 'float':'right'}).appendTo('body').MPChart({
-    //                 chartType: 'bar',
-    //                 data: fourthChartData
-    //             });
-    //             //$('.mixpanel-platform-multi_selector').css({'clear':'both'});
-    //             //$('.title').css({'width':'55px'});
-    //             $('.color_toggle_dropdown').each(function(){this.style.setProperty('width', '170px', 'important')});
-    //             $('.title').each(function(){this.style.setProperty('width', '105px', 'important')});
-                
-    //         }
-            
-            
-    //         drawGraph(first_chart.values(), second_chart.values(), third_chart.values(), fourth_chart.values());
-            
-    //     });
-    // });
     </script>
   </body>
 </html>
